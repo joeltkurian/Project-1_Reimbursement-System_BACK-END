@@ -10,11 +10,19 @@ describe("Login Service Tests", () => {
         async getAccountByUsername(username: string): Promise<Account> {
             if (username == "matt")
                 return { id: "", fname: "matt", lname: "damon", username: "matt", password: "pass", isManager: false };
+
+
             else
                 return null;
         },
         createAccount: function (account: Account): Promise<Account> {
             throw new Error("Not Checking!");
+        },
+        checkAccountById: function (id: string): Promise<boolean> {
+            throw new Error("Function not implemented.");
+        },
+        getAccountById: function (id: string): Promise<Account> {
+            throw new Error("Function not implemented.");
         }
     }
 

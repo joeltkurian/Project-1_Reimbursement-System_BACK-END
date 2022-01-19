@@ -26,7 +26,7 @@ describe("Login Service Tests", () => {
 
     it("Should work as password matches username provided", async () => {
         const acc: Account = await loginService.loginWithUsernamePassword("joelt", "joelt");
-        expect(acc.fname).toBe("joel");
+        expect(acc.fname).toBe("Joel");
 
     });
 

@@ -1,6 +1,6 @@
 import { AccountDao } from "../DAOS/accountDAO";
 import { Account } from "../entities";
-import { IncorrectAccount } from "../Error/incorrect-account"
+import { IncorrectAccount } from "../Error/error"
 
 export interface LoginService {
     loginWithUsernamePassword(username: string, password: string): Promise<Account>;

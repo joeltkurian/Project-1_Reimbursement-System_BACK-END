@@ -9,6 +9,10 @@ export default function errorHandler(error: Error, req: Request, res: Response) 
             res.status(411);
         res.send(error.message);
     }
+    else if (error instanceof ReimbursementError) {
+        res.status(501);
+        res.send(error.message);
+    }
 }
 
 export class IncorrectAccount extends Error {
@@ -17,5 +21,11 @@ export class IncorrectAccount extends Error {
         super(...params);
         this.message = message;
         this.ernum = ernum;
+    }
+}
+
+export class ReimbursementError extends Error {
+    constructor(message: string) {
+        super(message);
     }
 }
