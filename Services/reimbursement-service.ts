@@ -1,5 +1,5 @@
 import { ReimbursementDao } from "../DAOS/reimbursementDAO";
-import { Account, Reimbursement } from "../entities";
+import { Account, Reimbursement, Stats } from "../entities";
 import { ReimbursementError } from "../Error/error";
 import { checkAccountService } from "./checkAccount-service";
 
@@ -8,6 +8,7 @@ export interface ReimbursementService {
     createReimbursement(accountId: string, name: string, amount: number): Promise<Reimbursement>;
     getReimbursements(accountId: string, managerControl: boolean): Promise<Reimbursement[]>;
     updateReimbursement(id: string, status: string, statusComment: string): Promise<Reimbursement>;
+    createStatistics(): Promise<Stats[]>;
 }
 
 export class ReimbursementServiceImpl implements ReimbursementService {
@@ -67,5 +68,31 @@ export class ReimbursementServiceImpl implements ReimbursementService {
 
         const updatedReimbursement: Reimbursement = await this.reimbursementDao.updateStatusReimbursement(newReimbursement);
         return updatedReimbursement;
+    }
+
+    async createStatistics(): Promise<Stats[]> {
+        const reimbursements: Reimbursement[] = await this.reimbursementDao.getReimbursements('', true);
+        if (!reimbursements) {
+            throw new ReimbursementError('No Reimbursements present');
+        }
+        let reimburse: Stats[] = [];
+        let accountID = '';
+        for (const c of reimbursements) {
+            if (c.status === "approved") {
+                if (c.account.id != accountID) {
+                    const r: { name: string, amount: number } = { name: c.name, amount: c.amount };
+                    accountID = c.account.id;
+                    reimburse.push({ fname: c.account.fname, lname: c.account.lname, totalAmount: c.amount, accountID: accountID, reimb: [] });
+                    const lastElem = reimburse.length - 1;
+                    reimburse[lastElem].reimb.push(r);
+                } else {
+                    const lastElem = reimburse.length - 1;
+                    reimburse[lastElem].totalAmount += c.amount;
+                    const r: { name: string, amount: number } = { name: c.name, amount: c.amount };
+                    reimburse[lastElem].reimb.push(r);
+                }
+            }
+        }
+        return reimburse;
     }
 }

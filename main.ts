@@ -1,15 +1,16 @@
 import express from 'express';
 import { AccountDao, AccountDaoImpl } from './DAOS/accountDAO';
-import { Account, Reimbursement } from './entities';
+import { Account, Reimbursement, Stats } from './entities';
 import { LoginService, LoginServiceImpl } from './Services/login-service';
 import cors from 'cors';
 import errorHandler from './Error/error';
 import { ReimbursementService, ReimbursementServiceImpl } from './Services/reimbursement-service';
 import ReimbursementDaoImpl, { ReimbursementDao } from './DAOS/reimbursementDAO';
 import { checkAccountService, checkAccountServiceImpl } from './Services/checkAccount-service';
+import CustomLoggerImpl, { CustomLogger } from './customLogger';
 
 const app = express();
-
+app.disable("x-powered-by");
 app.use(express.json());
 app.use(cors());
 
@@ -18,12 +19,13 @@ const reimbursementDao: ReimbursementDao = new ReimbursementDaoImpl();
 const loginService: LoginService = new LoginServiceImpl(accountDao);
 const accountService: checkAccountService = new checkAccountServiceImpl(accountDao);
 const reimbursementService: ReimbursementService = new ReimbursementServiceImpl(reimbursementDao, accountService);
-
+const log: CustomLogger = new CustomLoggerImpl();
 
 //CREATE ACCOUNT (TEMPORARY)
 app.post('/accountCreation', async (req, res) => {
     const acc: { fname: string, lname: string, username: string, password: string, id: string, isManager: boolean } = req.body;
     const account: Account = await loginService.createAccount(acc);
+    console.log(log.logger(account, '/accountCreation :: POST Account'));
     res.status(201);
     res.send(account);
 });
@@ -32,6 +34,7 @@ app.patch("/login", async (req, res) => {
     try {
         const user: { username: string, password: string } = req.body;
         const account: Account = await loginService.loginWithUsernamePassword(user.username, user.password);
+        console.log(log.logger(account, '/login :: PATCH Login'));
         res.status(201);
         res.send(account);
     } catch (error) {
@@ -43,6 +46,7 @@ app.post('/reimbursement', async (req, res) => {
     try {
         const { accountId, name, amount } = req.body;
         const reimbursement: Reimbursement = await reimbursementService.createReimbursement(accountId, name, amount);
+        console.log(log.logger(reimbursement, '/reimbursement :: POST Reimbursement'));
         res.status(201);
         res.send(reimbursement);
     } catch (error) {
@@ -55,6 +59,11 @@ app.get('/reimbursement/:id/:managerControl', async (req, res) => {
         const { id } = req.params;
         const managerControl: boolean = req.params.managerControl === 'true' ? true : false;
         const reimbursements: Reimbursement[] = await reimbursementService.getReimbursements(id, managerControl);
+        if (managerControl == false)
+            console.log(log.logger(`${reimbursements[0].account.fname} ${reimbursements[0].account.lname} account`, '//reimbursement/:id/:managerControl :: GET ALL Reimbursements'));
+        else
+            console.log(log.logger(`all accounts`, '//reimbursement/:id/:managerControl :: GET ALL Reimbursements'));
+
         if (reimbursements.length == 0) {
             res.status(250);
         }
@@ -72,12 +81,26 @@ app.patch('/reimbursement/:id/:status', async (req, res) => {
         const { id, status } = req.params;
         const { statusComment } = req.body;
         const reimbursement: Reimbursement = await reimbursementService.updateReimbursement(id, status, statusComment);
+        console.log(log.logger(reimbursement, '/reimbursement/:id/:status :: PATCH Update Reimbursement'));
         res.status(200);
         res.send(reimbursement);
     } catch (error) {
         console.log(error.message);
         res.send(505);
-        res.send(error);
+        errorHandler(error, req, res);
+    }
+});
+
+app.get('/manager/statistics', async (req, res) => {
+    try {
+        const stats: Stats[] = await reimbursementService.createStatistics();
+        console.log(log.logger(null, '/manager/statistics :: GET Statistics for all Reimbursements'));
+        res.status(200);
+        res.send(stats);
+    } catch (error) {
+        console.log(error.message);
+        res.status(501);
+        res.send(error.message);
     }
 });
 

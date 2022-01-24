@@ -28,17 +28,23 @@ export default class ReimbursementDaoImpl implements ReimbursementDao {
 
     async getReimbursements(accountId: string, managerControl: boolean): Promise<Reimbursement[]> {
         let query;
-        if (managerControl) {
-            query = "SELECT * from A WHERE A.account.id != @aid ORDER BY A.account.id";
+        let response;
+        if (accountId == '') {
+            response = await container.items.query("SELECT * from A ORDER BY A.account.id").fetchAll();
         }
-        else {
-            query = "SELECT * from A WHERE A.account.id = @aid"
+        else if (accountId != '') {
+            if (managerControl) {
+                query = "SELECT * from A WHERE A.account.id != @aid ORDER BY A.account.id";
+            }
+            else {
+                query = "SELECT * from A WHERE A.account.id = @aid"
+            }
+            response = await container.items.query({
+                query,
+                parameters: [{ name: "@aid", value: accountId }]
+            }).fetchAll();
         }
-        const { resources } = await container.items.query({
-            query,
-            parameters: [{ name: "@aid", value: accountId }]
-        }).fetchAll();
-        return resources;
+        return response.resources;
     }
 
     async getReimbursementByID(id: string): Promise<Reimbursement> {

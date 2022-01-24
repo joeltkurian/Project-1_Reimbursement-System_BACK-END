@@ -15,3 +15,11 @@ export interface Reimbursement {
     status: string,
     statusComment?: string
 }
+
+export interface Stats {
+    fname: string,
+    lname: string,
+    totalAmount: number,
+    accountID: string,
+    reimb: { name: string, amount: number }[]
+}
