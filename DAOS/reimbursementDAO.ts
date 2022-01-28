@@ -1,8 +1,6 @@
 import { CosmosClient } from "@azure/cosmos";
 import { v4 } from "uuid";
 import { Reimbursement } from "../entities";
-import { ReimbursementError } from "../Error/error";
-
 
 
 const client = new CosmosClient(process.env.COSMOS_CONNECTION);
@@ -11,11 +9,8 @@ const container = database.container('Reimbursements');
 
 export interface ReimbursementDao {
     createReimbursement(Reimbursement: Reimbursement): Promise<Reimbursement>;
-
     getReimbursements(accountId: string, managerControl: boolean): Promise<Reimbursement[]>;
-
     getReimbursementByID(id: string): Promise<Reimbursement>;
-
     updateStatusReimbursement(reimbursement: Reimbursement): Promise<Reimbursement>;
 }
 
@@ -49,7 +44,6 @@ export default class ReimbursementDaoImpl implements ReimbursementDao {
 
     async getReimbursementByID(id: string): Promise<Reimbursement> {
         const response = await container.item(id, id).read<Reimbursement>();
-
         const reimbursement: Reimbursement = response.resource;
         return reimbursement;
     }

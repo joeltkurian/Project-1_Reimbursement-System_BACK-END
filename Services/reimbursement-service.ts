@@ -5,7 +5,7 @@ import { checkAccountService } from "./checkAccount-service";
 
 
 export interface ReimbursementService {
-    createReimbursement(accountId: string, name: string, amount: number): Promise<Reimbursement>;
+    createReimbursement(accountId: string, name: string, amount: number, formData: any): Promise<Reimbursement>;
     getReimbursements(accountId: string, managerControl: boolean): Promise<Reimbursement[]>;
     updateReimbursement(id: string, status: string, statusComment: string): Promise<Reimbursement>;
     createStatistics(): Promise<Stats[]>;
@@ -20,7 +20,7 @@ export class ReimbursementServiceImpl implements ReimbursementService {
         this.checkAccountService = accountService;
     }
 
-    async createReimbursement(accountId: string, name: string, amount: number): Promise<Reimbursement> {
+    async createReimbursement(accountId: string, name: string, amount: number, formData: any): Promise<Reimbursement> {
         if (await this.checkAccountService.checkAccountId(accountId) == true) {
             if (isNaN(amount)) {
                 throw new ReimbursementError('Amount is not a Number');
@@ -31,8 +31,10 @@ export class ReimbursementServiceImpl implements ReimbursementService {
                     amount: Number(amount),
                     account: await this.checkAccountService.getAccountById(accountId),
                     id: '',
-                    status: "",
+                    status: ""
                 }
+                if (formData)
+                    reimbursement.formData = formData;
                 const reimburse: Reimbursement = await this.reimbursementDao.createReimbursement(reimbursement);
                 return reimburse;
             }

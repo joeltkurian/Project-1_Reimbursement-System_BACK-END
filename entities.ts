@@ -13,7 +13,8 @@ export interface Reimbursement {
     account: { fname: string, lname: string, id: string },
     id: string,
     status: string,
-    statusComment?: string
+    statusComment?: string,
+    formData?: string
 }
 
 export interface Stats {
