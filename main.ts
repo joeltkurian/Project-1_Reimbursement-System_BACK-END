@@ -47,7 +47,7 @@ app.patch("/login", async (req, res) => {
 app.post('/reimbursement', async (req, res) => {
     try {
         const { accountId, name, amount, formData } = req.body;
-        // console.log(formData);
+        console.log(formData);
         const reimbursement: Reimbursement = await reimbursementService.createReimbursement(accountId, name, amount, formData);
         console.log(log.logger(reimbursement, '/reimbursement :: POST Reimbursement'));
         res.status(201);

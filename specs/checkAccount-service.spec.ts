@@ -26,6 +26,7 @@ describe("Check Account Service Tests", () => {
                 return { fname: 'Joel', lname: 'Kurian', id: '101' };
         }
     }
+
     const checkAccountService: checkAccountService = new checkAccountServiceImpl(accountDaoStub);
     it("Should return true for a valid account", async () => {
         expect(await checkAccountService.checkAccountId('101')).toBeTruthy;

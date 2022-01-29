@@ -87,27 +87,27 @@ describe("Check Account Service Tests", () => {
     const accountService: checkAccountService = new checkAccountServiceImpl(memberDaoStub);
     const reimbursementService: ReimbursementService = new ReimbursementServiceImpl(reimbursementDao, accountService);
     it("Should check for an account, then add the reimbursement", async () => {
-        const reimburse: Reimbursement = await reimbursementService.createReimbursement('101', 'paint', 10);
+        const reimburse: Reimbursement = await reimbursementService.createReimbursement('101', 'paint', 10, 'Some random URI Text, were not going to test this as I know it works and i am not going to fetch and recreate a file just for testing something that tests file upload and download');
         expect(reimburse.account.id).toBe('101');
         expect(reimburse.amount).toBe(10);
     });
     it("Should not add reimbursement as account not valid", async () => {
         try {
-            await reimbursementService.createReimbursement('201', 'draw', 100000);
+            await reimbursementService.createReimbursement('201', 'draw', 100000, null);
         }
         catch (e) {
             expect(e.message).toBe("Account stored in Session could not be found");
         }
     });
     it("Should get all of accountID=101's reimbursements", async () => {
-        await reimbursementService.createReimbursement('101', 'draw', 1000);
-        await reimbursementService.createReimbursement('101', 'gas', 40);
+        await reimbursementService.createReimbursement('101', 'draw', 1000, null);
+        await reimbursementService.createReimbursement('101', 'gas', 40, 'Testing file URI creation in the reimbursement.spec.ts');
         const reimbursements: Reimbursement[] = await reimbursementService.getReimbursements('101', false);
         expect(reimbursements.length).toBe(3);
     });
     it("Should return all reimbursements other than current manager reimbursements", async () => {
-        await reimbursementService.createReimbursement('202', 'zing', 10000);
-        await reimbursementService.createReimbursement('303', 'flight', 5000);
+        await reimbursementService.createReimbursement('202', 'zing', 10000, null);
+        await reimbursementService.createReimbursement('303', 'flight', 5000, null);
         const reimbursements: Reimbursement[] = await reimbursementService.getReimbursements('202', true);
         expect(reimbursements.length).toBe(4);
     });
@@ -119,7 +119,7 @@ describe("Check Account Service Tests", () => {
     });
     it("Should fail to get reimbursements as account doesn't exist", async () => {
         try {
-            await reimbursementService.createReimbursement('201', 'draw', 1000);
+            await reimbursementService.createReimbursement('201', 'draw', 1000, 'Not going to check file upload for a stub test');
         } catch (e) {
             expect(e).toBeInstanceOf(ReimbursementError);
         }
