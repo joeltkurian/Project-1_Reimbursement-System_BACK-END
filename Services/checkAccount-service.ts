@@ -1,5 +1,4 @@
 import { AccountDao } from "../DAOS/accountDAO";
-import { Account } from "../entities";
 
 export interface checkAccountService {
     checkAccountId(accountId: string): Promise<boolean>;

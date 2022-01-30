@@ -1,5 +1,5 @@
 import { ReimbursementDao } from "../DAOS/reimbursementDAO";
-import { Account, Reimbursement, Stats } from "../entities";
+import { Reimbursement, Stats } from "../entities";
 import { ReimbursementError } from "../Error/error";
 import { checkAccountService } from "./checkAccount-service";
 
