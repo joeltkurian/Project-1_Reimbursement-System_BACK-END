@@ -23,7 +23,7 @@ const accountService: checkAccountService = new checkAccountServiceImpl(accountD
 const reimbursementService: ReimbursementService = new ReimbursementServiceImpl(reimbursementDao, accountService);
 const log: CustomLogger = new CustomLoggerImpl();
 
-//CREATE ACCOUNT (TEMPORARY)
+//CREATE ACCOUNT
 app.post('/accountCreation', async (req, res) => {
     const acc: { fname: string, lname: string, username: string, password: string, id: string, isManager: boolean } = req.body;
     const account: Account = await loginService.createAccount(acc);
@@ -32,6 +32,7 @@ app.post('/accountCreation', async (req, res) => {
     res.send(account);
 });
 
+// LOGIN TO ACCOUNT
 app.patch("/login", async (req, res) => {
     try {
         const user: { username: string, password: string } = req.body;
@@ -44,6 +45,7 @@ app.patch("/login", async (req, res) => {
     }
 });
 
+// CREATE A NEW REIMBURSEMENT PROVIDED A OBJECT WITH CERTAIN VALUES
 app.post('/reimbursement', async (req, res) => {
     try {
         const { accountId, name, amount, formData } = req.body;
@@ -57,6 +59,7 @@ app.post('/reimbursement', async (req, res) => {
     }
 });
 
+// GET ALL REIMBURSEMENTS GIVEN AN ID, OR IF A MANAGER, GET ALL REIMBURSEMENTS OTHER THAN THE MANAGERS
 app.get('/reimbursement/:id/:managerControl', async (req, res) => {
     try {
         const { id } = req.params;
@@ -84,6 +87,7 @@ app.get('/reimbursement/:id/:managerControl', async (req, res) => {
     }
 });
 
+// UPDATE A REIMBURSEMENT WITH A STATUS AND COMMENT?
 app.patch('/reimbursement/:id/:status', async (req, res) => {
     try {
         const { id, status } = req.params;
@@ -99,6 +103,7 @@ app.patch('/reimbursement/:id/:status', async (req, res) => {
     }
 });
 
+// GET THE STATISTICS WHICH WILL RETRIEVE ALL REIMBURSEMENTS IN COSMOS AND RETURN RELEVANT INFORMATION
 app.get('/manager/statistics', async (req, res) => {
     try {
         const stats: Stats[] = await reimbursementService.createStatistics();
